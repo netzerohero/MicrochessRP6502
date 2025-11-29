@@ -46,6 +46,7 @@
 ;.import ACIAout, ACIAin      ; import ACIA character I/O routines
 ;.import SNDCHR,  RCCHR       ; import character I/O routines
 .import  syschout, syskin	  ; import character I/O routines
+.import  _exit
 
 .include "rp6502.inc"
 
@@ -173,7 +174,7 @@ NOGO	CMP	#$0D        ; [Enter]
 NOMV	CMP #$41		; [Q] ***Added to allow game exit***
 		BEQ DONE		; quit the game, exit back to system.  
 		JMP	INPUT		; process move
-DONE	JMP $FF00		; *** MUST set this to YOUR OS starting address
+DONE	JMP _exit		; *** MUST set this to YOUR OS starting address
 ;		
 ;       THE ROUTINE JANUS DIRECTS THE
 ;       ANALYSIS BY DETERMINING WHAT
