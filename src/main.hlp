@@ -1,3 +1,5 @@
 #!RP6502
-# This information is displayed with the HELP and INFO monitor commands.
-# Please change it to suit your project.
+#
+# Microchess - RP6502 port of Peter Jennings' 1976 MICROCHESS for the KIM-1.
+#
+# Reference: www.benlo.com
