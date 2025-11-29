@@ -34,15 +34,30 @@
 ;
 ; Updated with corrections to earlier OCR errors by Bill Forster, August 2005.
 ;
+; CHANGES FOR RP6502 SBC CONVERSION --- BY netzerohero
+; 29-Nov-2025 Modified for ca65 (cc65-toolchain) assembler
+
+; 29-Nov-2025 RP6502
+;        Modified from the 2005/2002 Bill Forster / Daryl Rictor mods
+;        from TASM-syntax to ca65 assembler syntax 
+;
+
+.export CHESS                 ; Export MICROCHESS start vector
+;.import ACIAout, ACIAin       ; import ACIA character I/O routines
+.import  SNDCHR,  RCCHR        ; import character I/O routines
+
+.include "rp6502.inc"
+
+
    cpu 65c02
    page 0,132
 ;
 ; 6551 I/O Port Addresses
 ;
-ACIADat	= 	$7F70
-ACIASta	=	$7F71
-ACIACmd	=	$7F72
-ACIACtl	=	$7F73
+;ACIADat	= 	$7F70
+;ACIASta	=	$7F71
+;ACIACmd	=	$7F72
+;ACIACtl	=	$7F73
 ;
 ; page zero variables
 ;
@@ -90,13 +105,20 @@ DIS2    =	$FA
 DIS3    =	$F9 
 temp    =       $FC
 ;
+;NOTE THAT $B7 TO $BF, $F4 TO $F8, AND $FC TO $FF ARE
+;AVAILABLE FOR USER EXPANSION AND I/O ROUTINES
+;$FE is used as temp-var in RP6502-port for SNDCHR char-i/o
+
+.feature labels_without_colons +  ; porting legacy assembly code 
+
+
+.segment "CODE"
 ;
-;
-		*=$1000			; load into RAM @ $1000-$15FF
+;		*=$1000			; load into RAM @ $1000-$15FF
 
 		LDA     #$00		; REVERSE TOGGLE
 		STA     REV
-                JSR     Init_6551
+;       JSR     Init_6551
 CHESS		CLD			; INITIALIZE
 		LDX	#$FF		; TWO STACKS
 		TXS	
@@ -108,7 +130,7 @@ CHESS		CLD			; INITIALIZE
 ;       FROM KEYBOARD
 ;		
 OUT		JSR	pout		; DISPLAY AND
-		JSR	KIN		; GET INPUT   *** my routine waits for a keypress
+		JSR	KIN		; GET INPUT   *** original routine waits for a keypress
 ;		CMP	OLDKY		; KEY IN ACC  *** no need to debounce
 ;		BEQ	OUT		; (DEBOUNCE)
 ;		STA	OLDKY
@@ -810,37 +832,39 @@ Pout14		lda   	banner,x
 POUT15		rts         
 
 KIN        	LDA   	#"?"
-		JSR   	syschout	; PRINT ONE ASCII CHR - ?
-		JSR   	syskin		; GET A KEYSTROKE FROM SYSTEM
+;		JSR   	syschout	; PRINT ONE ASCII CHR - ?
+;		JSR   	syskin		; GET A KEYSTROKE FROM SYSTEM
+		JSR		SNDCHR  	; RP6502-port
+		JSR 	RCCHR   	; RP6502-port 
             	AND   	#$4F            ; MASK 0-7, AND ALPHA'S
             	RTS
 ;
 ; 6551 I/O Support Routines
 ;
 ;
-Init_6551      lda   #$1F               ; 19.2K/8/1
-               sta   ACIActl            ; control reg 
-               lda   #$0B               ; N parity/echo off/rx int off/ dtr active low
-               sta   ACIAcmd            ; command reg 
-               rts                      ; done
+;Init_6551      lda   #$1F               ; 19.2K/8/1
+;               sta   ACIActl            ; control reg 
+;               lda   #$0B               ; N parity/echo off/rx int off/ dtr active low
+;               sta   ACIAcmd            ; command reg 
+;               rts                      ; done
 ;
 ; input chr from ACIA1 (waiting)
 ;
-syskin         lda   ACIASta            ; Serial port status             
-               and   #$08               ; is recvr full
-               beq   syskin             ; no char to get
-               Lda   ACIAdat            ; get chr
-               RTS                      ;
+;syskin         lda   ACIASta            ; Serial port status             
+;               and   #$08               ; is recvr full
+;               beq   syskin             ; no char to get
+;               Lda   ACIAdat            ; get chr
+;               RTS                      ;
 ;
 ; output to OutPut Port
 ;
-syschout       PHA                      ; save registers
-ACIA_Out1      lda   ACIASta            ; serial port status
-               and   #$10               ; is tx buffer empty
-               beq   ACIA_Out1          ; no
-               PLA                      ; get chr
-               sta   ACIAdat            ; put character to Port
-               RTS                      ; done
+;syschout       PHA                      ; save registers
+;ACIA_Out1      lda   ACIASta            ; serial port status
+;               and   #$10               ; is tx buffer empty
+;               beq   ACIA_Out1          ; no
+;               PLA                      ; get chr
+;               sta   ACIAdat            ; put character to Port
+;               RTS                      ; done
 
 syshexout      PHA                     ;  prints AA hex digits
                LSR                     ;  MOVE UPPER NIBBLE TO LOWER
@@ -854,7 +878,11 @@ PrintDig       AND   #$0F              ;  prints A hex nibble (low 4 bits)
                TAY                     ;
                LDA   Hexdigdata,Y      ;
                PLY
-               jmp   syschout          ;
+;              jmp   syschout          ;
+			   jmp	 SNDCHR			   ; RP6502-port 
+
+
+.segment "RODATA"
 
 Hexdigdata	asc	"0123456789ABCDEF"
 banner		asc	"MicroChess (c) 1996-2005 Peter Jennings, www.benlo.com"
@@ -866,7 +894,7 @@ cph		asc	"KQRRBBNNPPPPPPPPKQRRBBNNPPPPPPPP"
 ; end of added code
 ;
 ; BLOCK DATA
-		*= $1580
+;		*= $1580
 SETW		db 	$03, $04, $00, $07, $02, $05, $01, $06
         	db 	$10, $17, $11, $16, $12, $15, $14, $13
         	db 	$73, $74, $70, $77, $72, $75, $71, $76
