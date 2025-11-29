@@ -1,4 +1,13 @@
-# RP6502 VS Code Scaffolding for CC65
+# Microchess for the RP6502 SBC
+
+Peter Jennings' Microchess for the RP6502 SBC.
+
+Reference: www.benlo.com/microchess/
+
+See the User Manual in the 'docs' sub-directory for more information.
+
+
+## Reference - RP6502 VS Code Scaffolding for CC65 tool-chain:
 
 This provides scaffolding for a new Picocomputer 6502 software project. Both
 C and assembly examples of "Hello, world!" are included. Make sure
