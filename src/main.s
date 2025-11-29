@@ -1,6 +1,7 @@
 .export _init, _exit
 .export __STARTUP__ : absolute = 1
-.export  SNDCHR,  RCCHR 
+;.export  SNDCHR, RCCHR
+.export  syschout,  syskin 
 .import  CHESS   ; import MICROCHESS startup vector
 
 .include "rp6502.inc"
@@ -43,11 +44,13 @@ _exit:
 ; Remove RTS at bottom to run into char-out to provide screen-echo;
 ;  or: change JMP to JSR in jump-table for same echo effect.
 ;
-RCCHR:
+syskin:
+;RCCHR:
 ;ACIAin:
       BIT   RIA_READY
 ;     BVC   ACIAin            ; loop until a valid key-press char-byte is rcvd
-      BVC   RCCHR             ; loop until a valid key-press char-byte is rcvd
+;     BVC   RCCHR             ; loop until a valid key-press char-byte is rcvd
+      BVC   syskin            ; loop until a valid key-press char-byte is rcvd
       LDA   RIA_RX            ; get char-byte from simulated ACIA
                       ;consider masking hi-bit to ensure a valid-ASCII char
 ;     and #%01111111          ; Clear high bit to be valid ASCII
@@ -57,7 +60,8 @@ RCCHR:
 
 ; Send a character out to simulated ACIA / screen-terminal
 ;
-SNDCHR:
+syschout:
+;SNDCHR:
 ;ACIAout:
 ; First filter characters before sending to ACIA
     sta $FE                   ; Save the character to be printed
