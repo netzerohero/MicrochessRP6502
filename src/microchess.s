@@ -593,7 +593,7 @@ PUSH	CMP	BESTV         	; IS THIS BEST
 		STA	BESTP
 		LDA	SQUARE
 		STA	BESTM        	; FLASH DISPLAY
-RETP	LDA	'.'				; print ... instead of flashing disp
+RETP	LDA	#$2E       ;'.' ; print ... instead of flashing disp
 		JMP	syschout		; print . and return
 ;		
 ;       MAIN PROGRAM TO PLAY CHESS
@@ -833,7 +833,7 @@ POUT14	lda   	banner,x
 		bne   	POUT14
 POUT15	rts         
 
-KIN     LDA   	'?'
+KIN     LDA   	#$3F        ;'?'
 		JSR   	syschout	; PRINT ONE ASCII CHR - ?
 		JSR   	syskin		; GET A KEYSTROKE FROM SYSTEM
 ;		JSR		SNDCHR  	; RP6502-port
