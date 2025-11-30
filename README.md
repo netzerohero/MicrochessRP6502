@@ -1,12 +1,12 @@
 # Microchess for the RP6502 SBC
 
-Peter Jennings' Microchess for the RP6502 SBC.
+Peter Jennings' Microchess built for the RP6502 SBC using the RP6502 tool-chain and the cc65/ca65 assembler. 
 
-Reference: www.benlo.com/microchess/.
+Source-code Reference and Historical Information: www.benlo.com/microchess/.
 
-See the User Manual in the 'docs' sub-directory for more information.
+Also see the User Manual available at the above link and in the 'docs' sub-directory herein.
 
-## Quick-start information derived from Daryl Rictor's Aug-2002 Readme:
+## Quick-start information derived from Daryl Rictor's Aug-2002 port & Readme:
 
 Microchess was developed in 1976 originally for the KIM-1. Later versions 
 included 1.5 ported to the Commodore PET and Commodore Chessmate; and 2.0 
