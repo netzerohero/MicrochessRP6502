@@ -2,10 +2,11 @@
 
 Peter Jennings' Microchess for the RP6502 SBC.
 
-Reference: www.benlo.com/microchess/
+Reference: www.benlo.com/microchess/.
+
 See the User Manual in the 'docs' sub-directory for more information.
 
-Quick-start information derived from Daryl Rictor's Aug-2002 Readme:
+## Quick-start information derived from Daryl Rictor's Aug-2002 Readme:
 
 Microchess was developed in 1976 originally for the KIM-1. Later versions 
 included 1.5 ported to the Commodore PET and Commodore Chessmate; and 2.0 
@@ -25,13 +26,13 @@ spaces.  Hopefully, this won't confuse everyone.  If it does, then feel free to
 alter the code just before label 'POUT25' to reverse the characters.
 
 Commands are:
--C - clear and restart the game (when entered, CC CC CC will appear)
--E - toggle sides (when entered, EE EE EE will appear) 
--P - tell the computer to "Play Chess".  By default, the computer will play white.
+- C - clear and restart the game (when entered, CC CC CC will appear)
+- E - toggle sides (when entered, EE EE EE will appear) 
+- P - tell the computer to "Play Chess".  By default, the computer will play white.
     To play black, after clearing the game, press E to switch sides, enter your 
     move (as described below), and then press P.  
--<Enter> - give the computer YOUR move
--Q - Quit the Game (JMP's to address $E800 (the SBC monitor entry point)
+- [Enter] - give the computer YOUR move
+- Q - Quit the Game (JMP's to address $E800 (the SBC monitor entry point)
 
 You must clear (i.e. reset) the game when you play it for the first time 
 in a session.  The game is not cleared automatically for you when you start 
@@ -92,8 +93,8 @@ will not construct its strategy with it in mind.
 Queening pawns must be done manually by altering the game board image 
 from the SBC monitor. Stop the game with 'Q', remove the queened pawn by 
 entering CC in its location (see table above) and set your Queen at 0061 
-to this queened pawn. After adjustment, type '1000G<Enter>' to resume 
-the game.  As only one Queen can be on the board at once, if you still have 
+to this queened pawn. After adjustment, restart the game. 
+As only one Queen can be on the board at once, if you still have 
 a Queen you must select some other captured piece and then move that as if 
 it were a queen. The computer will also not autopromote its queened pawns, 
 so you'll have to do that as well. 
@@ -102,7 +103,7 @@ The computer will resign if it ends up in checkmate or stalemate; the display
 will read 'ff ff ff'.  You are, of course, expected to show the same courtesy 
 when you are checkmated, and restart the game. 
 
-\[Edit: addresses below need updating for the RP6502 SBC.\]
+\[Edit: addresses below need updating for the RP6502 SBC; consult mapfile.\]
 
 There are a few points of adjustment for skill level. By default, 08 at $11F5
  and FB at $10DE indicates normal mode with an average time per move of ~100s. 
