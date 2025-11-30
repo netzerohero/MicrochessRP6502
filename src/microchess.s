@@ -105,7 +105,7 @@ BESTM   =	$F9
 DIS1    =	$FB 
 DIS2    =	$FA 
 DIS3    =	$F9 
-temp    =       $FC
+temp    =   $FC
 ;
 ;NOTE THAT $B7 TO $BF, $F4 TO $F8, AND $FC TO $FF ARE
 ;AVAILABLE FOR USER EXPANSION AND I/O ROUTINES
@@ -614,7 +614,7 @@ GO		LDX	OMOVE        	; OPENING?
 		STX	OMOVE        	; MOVE IT
 		BNE	MV2            	; (JMP)
 ;			
-END		LDA     #$FF		; *ADD - STOP CANNED MOVES
+END		LDA #$FF		    ; *ADD - STOP CANNED MOVES
 		STA	OMOVE        	; FLAG OPENING
 NOOPEN	LDX	#$0C           	; FINISHED
 		STX	STATE        	; STATE=C
@@ -838,7 +838,7 @@ KIN     LDA   	'?'
 		JSR   	syskin		; GET A KEYSTROKE FROM SYSTEM
 ;		JSR		SNDCHR  	; RP6502-port
 ;		JSR 	RCCHR   	; RP6502-port 
-        AND   	#$4F            ; MASK 0-7, AND ALPHA'S
+        AND   	#$4F        ; MASK 0-7, AND ALPHA'S
         RTS
 ;
 ; 6551 I/O Support Routines
