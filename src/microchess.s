@@ -39,88 +39,81 @@
 
 ; 29-Nov-2025 RP6502
 ;        Modified from the 2005/2002 Bill Forster / Daryl Rictor mods
-;        from TASM-syntax to ca65 assembler syntax 
+;        from TASM/65TASS-syntax to ca65 assembler syntax 
+;
+; 30-Nov-2025
+;        Remove char i/o code from earlier ports; white-space and comment cleanups, 
+;        including more OCR-scan errors found in the comments.
 ;
 
 .export  CHESS                ; Export MICROCHESS start vector
-;.import ACIAout, ACIAin      ; import ACIA character I/O routines
-;.import SNDCHR,  RCCHR       ; import character I/O routines
 .import  syschout, syskin	  ; import character I/O routines
 .import  _exit
 
 .include "rp6502.inc"
 
-
-;   cpu 65c02
-;   page 0,132
-;
-; 6551 I/O Port Addresses
-;
-;ACIADat	= 	$7F70
-;ACIASta	=	$7F71
-;ACIACmd	=	$7F72
-;ACIACtl	=	$7F73
 ;
 ; page zero variables
 ;
-BOARD   =	$50 
-BK      =	$60 
-PIECE   =	$B0 
+BOARD   =	$50 ; computer-pieces $50 - $5F; see user-manual pg-7
+BK      =	$60 ; player-pieces $60 - $6F
+PIECE   =	$B0 ; current piece under analysis; see manual pg-11
 SQUARE  =	$B1 
-SP2     =	$B2 
-SP1     =	$B3 
-INCHEK  =	$B4 
-STATE   =	$B5 
-MOVEN   =	$B6 
-REV	=       $B7
-OMOVE   =	$DC 
-WCAP0   =	$DD 
-COUNT   =	$DE 
-BCAP2   =	$DE 
-WCAP2   =	$DF 
-BCAP1   =	$E0 
-WCAP1   =	$E1 
-BCAP0   =	$E2 
-MOB     =	$E3 
-MAXC    =	$E4 
-CC      =	$E5 
-PCAP    =	$E6 
-BMOB    =	$E3 
-BMAXC   =	$E4 
-BMCC    =	$E5 		; was BCC (TASS doesn't like it as a label)
-BMAXP   =	$E6 
-XMAXC   =	$E8 
-WMOB    =	$EB 
-WMAXC   =	$EC 
-WCC     =	$ED 
-WMAXP   =	$EE 
-PMOB    =	$EF 
-PMAXC   =	$F0 
-PCC     =	$F1 
-PCP     =	$F2 
-OLDKY   =	$F3 
-BESTP   =	$FB 
-BESTV   =	$FA 
-BESTM   =	$F9 
-DIS1    =	$FB 
-DIS2    =	$FA 
-DIS3    =	$F9 
-temp    =   $FC
+SP2     =	$B2 ; stack pointer for stack 2
+SP1     =	$B3 ; stack pointer for stack 1
+INCHEK  =	$B4 ; move into CHECK flag
+STATE   =	$B5 ; state of anlaysis
+MOVEN   =	$B6 ; move table pointer
+REV	=       $B7 
+OMOVE   =	$DC ; OPENING pointer
+WCAP0   =	$DD ; computer (wht) CAPTURE 0
+COUNT   =	$DE ; start of COUNT table
+BCAP2   =	$DE ; OPPONENT (blk) CAPTURE 2
+WCAP2   =	$DF ; computer CAPTURE 2
+BCAP1   =	$E0 ; OPPONENT CAPTURE 1
+WCAP1   =	$E1 ; computer CAPTURE 1
+BCAP0   =	$E2 ; OPPONENT CAPTURE 0
+MOB     =	$E3 ; MOBILITY
+MAXC    =	$E4 ; maximum capture 
+CC      =	$E5 ; capture count
+PCAP    =	$E6 ; piece id of MAXC
+BMOB    =	$E3 ; OPPONENT MOBILITY
+BMAXC   =	$E4 ; OPPONENT maximum capture
+BMCC    =	$E5 ; OPPONENT CAPTURE count ; was BCC (TASS doesn't like it as a label)
+BMAXP   =	$E6 ; OPPONENT MAXP
+XMAXC   =	$E8 ; current maximum capture
+WMOB    =	$EB ; computer MOBILITY
+WMAXC   =	$EC ; computer maximum capture
+WCC     =	$ED ; computer capture count
+WMAXP   =	$EE ; computer MAXP
+PMOB    =	$EF ; previous computer MOB
+PMAXC   =	$F0 ; previous computer MAXC
+PCC     =	$F1 ; previous computer CC
+PCP     =	$F2 ; previous computer MAXP
+OLDKY   =	$F3 ; key input temporary ; not-used on RP6502
+BESTP   =	$FB ; piece of best move found
+BESTV   =	$FA ; value of best move found
+BESTM   =	$F9 ; to square of best move
+DIS1    =	$FB ; display point 1
+DIS2    =	$FA ; display point 2
+DIS3    =	$F9 ; display point 3
+temp    =   $FC ; used in POUT text-based board display
 ;
 ;NOTE THAT $B7 TO $BF, $F4 TO $F8, AND $FC TO $FF ARE
 ;AVAILABLE FOR USER EXPANSION AND I/O ROUTINES
-;$FE is used as temp-var in RP6502-port for SNDCHR char-i/o
+; RP6502-port:
+;$FE is used as temp-var in RP6502-port for syschout char-i/o
 
 .feature labels_without_colons +  ; porting legacy assembly code 
 
 
-.segment "CODE"
+.segment "CODE"     ; on RP6502 CODE segment default starts at $0200
 ;
-;		*=$1000			; load into RAM @ $1000-$15FF
+;		*=$1000		; load into RAM @ $1000-$15FF
 
-		LDA     #$00		; REVERSE TOGGLE
-		STA     REV
-;       JSR     Init_6551
+		LDA #$00	; REVERSE TOGGLE
+		STA REV
+;       JSR Init_6551
 CHESS	CLD			; INITIALIZE
 		LDX	#$FF	; TWO STACKS
 		TXS	
@@ -144,19 +137,19 @@ WHSET	LDA	SETW,X		; FROM
 		STA	BOARD,X		; SETW
 		DEX	
 		BPL	WHSET
-		LDX	#$1B		; *ADDED
+		LDX	#$1B		; *ADDED beyond 1976 original
 		STX	OMOVE		; INITS TO $FF
-		LDA	#$CC		; Display CCC
+		LDA	#$CC		; Display CC
 		BNE	CLDSP
 ;		
 NOSET	CMP	#$45		; [E]
 		BNE	NOREV		; REVERSE
-		JSR	REVERSE     ; BOARD IS
-		SEC
-		LDA	#$01
-		SBC	REV
-		STA	REV			; TOGGLE REV FLAG
-		LDA	#$EE        ; IS
+		JSR	REVERSE     ; BOARD AS-IS
+		SEC             ; *ADDED beyond 1976 original
+		LDA	#$01        ; *ADDED beyond 1976 original
+		SBC	REV         ; *ADDED beyond 1976 original
+		STA	REV			; *ADDED beyond 1976 original - TOGGLE REV FLAG
+		LDA	#$EE        ; (AS-IS)
 		BNE	CLDSP
 ;		
 NOREV	CMP	#$40		; [P]
@@ -198,7 +191,7 @@ COUNTS	LDA	PIECE
 		BEQ	XRT           	; WHITE
 ; 		
 OVER	INC	MOB,X          	; MOBILITY
-		CMP #$01           	;  + QUEEN
+		CMP #$01           	; + QUEEN
 		BNE	NOQ           	; FOR TWO
 		INC	MOB,X
 ;		
@@ -507,7 +500,7 @@ GENR2	JSR	REVERSE      	; REVERSE BOARD
 RUM		JSR	REVERSE   		; REVERSE BACK
 ;		
 ;       ROUTINE TO UNMAKE A MOVE MADE BY
-;	  MOVE
+;	             MOVE
 ;		
 UMOVE	TSX			; UNMAKE MOVE
 		STX	SP1
@@ -833,11 +826,9 @@ POUT14	lda   	banner,x
 		bne   	POUT14
 POUT15	rts         
 
-KIN     LDA   	#$3F        ;'?'
+KIN     LDA   	#$3F        ;'?' ; RP6502-port
 		JSR   	syschout	; PRINT ONE ASCII CHR - ?
 		JSR   	syskin		; GET A KEYSTROKE FROM SYSTEM
-;		JSR		SNDCHR  	; RP6502-port
-;		JSR 	RCCHR   	; RP6502-port 
         AND   	#$4F        ; MASK 0-7, AND ALPHA'S
         RTS
 ;

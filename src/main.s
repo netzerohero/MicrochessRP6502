@@ -1,6 +1,5 @@
 .export _init, _exit
 .export __STARTUP__ : absolute = 1
-;.export  SNDCHR, RCCHR
 .export  syschout,  syskin 
 .import  CHESS   ; import MICROCHESS startup vector
 
@@ -45,8 +44,6 @@ _exit:
 ;  or: change JMP to JSR in jump-table for same echo effect.
 ;
 syskin:
-;RCCHR:
-;ACIAin:
       BIT   RIA_READY
 ;     BVC   ACIAin            ; loop until a valid key-press char-byte is rcvd
 ;     BVC   RCCHR             ; loop until a valid key-press char-byte is rcvd
@@ -61,8 +58,6 @@ syskin:
 ; Send a character out to simulated ACIA / screen-terminal
 ;
 syschout:
-;SNDCHR:
-;ACIAout:
 ; First filter characters before sending to ACIA
     sta $FE                   ; Save the character to be printed
     cmp #$FF                  ; Check for a bunch of characters
@@ -98,7 +93,7 @@ message:
 MBLK:
          .byte  "MICROCHESS - Copyright 1976-2005 Peter Jennings, www.benlo.com"
          .byte  $0D, $0A
-         .byte  "RP6502 ver: 20251129_HHMM"
+         .byte  "RP6502 ver: 20251130_HHMM"
          .byte  $0D, $0A, 0
 
 
