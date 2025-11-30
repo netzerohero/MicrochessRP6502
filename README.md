@@ -1,6 +1,6 @@
 # Microchess for the RP6502 SBC
 
-Peter Jennings' Microchess built for the RP6502 SBC using the RP6502 tool-chain and the cc65/ca65 assembler. 
+Peter Jennings' Microchess built for the [RP6502 SBC](https://picocomputer.github.io/) using the RP6502 tool-chain and the cc65/ca65 assembler. 
 
 Source-code Reference and Historical Information: www.benlo.com/microchess/.
 
