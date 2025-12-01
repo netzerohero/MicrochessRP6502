@@ -875,7 +875,7 @@ PrintDig       AND   #$0F              ;  prints A hex nibble (low 4 bits)
 ;			   jmp	 SNDCHR			   ; RP6502-port 
 
 
-.segment "RODATA"
+.segment "RODATA" ; on RP6502 RODATA segment default starts immediately after CODE segment
 
 Hexdigdata	.byte	"0123456789ABCDEF"
 banner		.byte	"MicroChess (c) 1996-2005 Peter Jennings, www.benlo.com"

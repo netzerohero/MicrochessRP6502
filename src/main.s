@@ -91,9 +91,9 @@ message:
 ;        .byte 0
 
 MBLK:
-         .byte  "MICROCHESS - Copyright 1976-2005 Peter Jennings, www.benlo.com"
+         .byte  "MICROCHESS (from 1976 KIM-1) ported to the RP6502 SBC."
          .byte  $0D, $0A
-         .byte  "RP6502 ver: 20251130_HHMM"
+         .byte  "RP6502 ver: 20251130_1855"
          .byte  $0D, $0A, 0
 
 
